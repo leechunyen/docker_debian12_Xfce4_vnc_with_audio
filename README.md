@@ -1,8 +1,8 @@
-# docker debian12 Xfce4 vnc
+# docker debian12 Xfce4 vnc with audio
 
-This Docker image provides a Debian 12 environment with XFCE4 desktop accessible via VNC or noVNC.
-Audio streaming only on noVNC.
-Here's how to set it up and use it
+This Docker image provides a Debian 12 environment with an XFCE4 desktop accessible via VNC or noVNC. \
+Audio streaming is supported only on noVNC. \
+Here's how to set it up and use it:
 
 ## Prerequisites
 
