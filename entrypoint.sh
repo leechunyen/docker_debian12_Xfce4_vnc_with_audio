@@ -4,8 +4,10 @@ trap ctrl_c INT
 function ctrl_c() {
   exit 0
 }
+
+USER_HOME="/home/user"
 rm /tmp/.X1-lock 2> /dev/null &
-touch /root/.Xauthority
+touch "${USER_HOME}/.Xauthority"
 
 # Create .vnc directory
 mkdir -p ~/.vnc
@@ -34,7 +36,7 @@ vncserver $DISPLAY -depth $VNC_COL_DEPTH -geometry $VNC_RESOLUTION -SecurityType
 /src/audio_streaming/audio_server -port $AUDIO_STREAM_PORT &
 
 # Start nginx
-nginx
+sudo nginx
 
 # Give the servers some time to start
 sleep 5
