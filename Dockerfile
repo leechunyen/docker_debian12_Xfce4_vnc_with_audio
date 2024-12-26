@@ -13,7 +13,8 @@ ENV DISPLAY=:1 \
     DEBIAN_FRONTEND=noninteractive \
     TERM=xterm \
     LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
+    LC_ALL=en_US.UTF-8 \
+    LANGUAGE=en_US:en
 
 # INSTALL DEPENDENCIES
 RUN apt-get update && \
@@ -21,13 +22,14 @@ RUN apt-get update && \
     xvfb xauth dbus-x11 xfce4 xfce4-terminal \
     sudo curl gpg git bzip2 procps x11-xserver-utils \
     libnss3 libnspr4 libasound2 libgbm1 ca-certificates xdg-utils \
-    fonts-liberation fonts-noto fonts-noto-cjk fonts-dejavu fonts-droid-fallback fonts-freefont-ttf \
+    locales fonts-liberation fonts-noto fonts-noto-cjk fonts-dejavu fonts-droid-fallback fonts-freefont-ttf \
     tigervnc-standalone-server tigervnc-common tigervnc-tools pulseaudio ffmpeg golang-go unzip nginx; \
     curl http://ftp.us.debian.org/debian/pool/main/liba/libappindicator/libappindicator3-1_0.4.92-7_amd64.deb --output /opt/libappindicator3-1_0.4.92-7_amd64.deb && \
     curl http://ftp.us.debian.org/debian/pool/main/libi/libindicator/libindicator3-7_0.5.0-4_amd64.deb --output /opt/libindicator3-7_0.5.0-4_amd64.deb && \
     apt-get install -y /opt/libappindicator3-1_0.4.92-7_amd64.deb /opt/libindicator3-7_0.5.0-4_amd64.deb; \
     rm -vf /opt/lib*.deb; \
     apt-get clean; \
+    echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen &&  locale-gen; \
     fc-cache -fv; \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
