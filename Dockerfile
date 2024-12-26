@@ -3,9 +3,10 @@ FROM debian:12
 # ENVIRONMENT VARIABLES
 ENV DISPLAY=:1 \
     VNC_PASSWORD="password" \
+    WEB_PORT=80 \
     VNC_PORT=5901 \
-    NO_VNC_PORT=80 \
-    AUDIO_STREAM_PORT=1000 \
+    NO_VNC_PORT=10000 \
+    AUDIO_STREAM_PORT=10001 \
     VNC_COL_DEPTH=32 \
     VNC_RESOLUTION=1024x768 \
     DEBIAN_FRONTEND=noninteractive \
@@ -17,7 +18,7 @@ RUN apt-get update && \
     xvfb xauth dbus-x11 xfce4 xfce4-terminal \
     wget sudo curl gpg git bzip2 vim procps python3 x11-xserver-utils \
     libnss3 libnspr4 libasound2 libgbm1 ca-certificates fonts-liberation xdg-utils \
-    tigervnc-standalone-server tigervnc-common tigervnc-tools firefox-esr pulseaudio ffmpeg golang-go unzip; \
+    tigervnc-standalone-server tigervnc-common tigervnc-tools firefox-esr pulseaudio ffmpeg golang-go unzip nginx; \
     curl http://ftp.us.debian.org/debian/pool/main/liba/libappindicator/libappindicator3-1_0.4.92-7_amd64.deb --output /opt/libappindicator3-1_0.4.92-7_amd64.deb && \
     curl http://ftp.us.debian.org/debian/pool/main/libi/libindicator/libindicator3-7_0.5.0-4_amd64.deb --output /opt/libindicator3-7_0.5.0-4_amd64.deb && \
     apt-get install -y /opt/libappindicator3-1_0.4.92-7_amd64.deb /opt/libindicator3-7_0.5.0-4_amd64.deb; \
@@ -49,7 +50,11 @@ RUN go get github.com/gorilla/websocket
 RUN go build -o audio_server audio_server.go
 RUN rm -rf audio_server.go go.mod go.sum
 
+# NGINX PROXY
+COPY nginx.conf /etc/nginx
+RUN nginx -t
+
 WORKDIR /
 
-EXPOSE $VNC_PORT $NO_VNC_PORT $AUDIO_STREAM_PORT
+EXPOSE $WEB_PORT $VNC_PORT
 ENTRYPOINT ["/src/entrypoint.sh"]

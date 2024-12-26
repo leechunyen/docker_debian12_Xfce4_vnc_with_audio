@@ -33,6 +33,9 @@ vncserver $DISPLAY -depth $VNC_COL_DEPTH -geometry $VNC_RESOLUTION -SecurityType
 # Start Go audio server
 /src/audio_streaming/audio_server -port $AUDIO_STREAM_PORT &
 
+# Start nginx
+nginx
+
 # Give the servers some time to start
 sleep 5
 

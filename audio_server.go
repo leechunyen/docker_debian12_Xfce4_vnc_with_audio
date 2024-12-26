@@ -11,7 +11,7 @@ import (
 )
 
 var (
-    port = flag.Int("port", 1000, "Port to listen on")
+    port = flag.Int("port", 10001, "Port to listen on")
 )
 
 var upgrader = websocket.Upgrader{
