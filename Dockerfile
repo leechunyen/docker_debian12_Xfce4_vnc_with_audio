@@ -61,9 +61,8 @@ RUN useradd -ms /bin/bash user && \
 # GIVE USER PERMISSION TO RUN NGINX WITHOUT PASSWORD
 RUN echo "user ALL=(ALL) NOPASSWD: /usr/sbin/nginx" >> /etc/sudoers
 
-# COPY SCRIPT
+# CREATE src DIR
 RUN mkdir /src
-COPY entrypoint.sh /src
 
 # COMPILE audio_server
 RUN mkdir /src/audio_streaming
@@ -78,9 +77,13 @@ RUN rm -rf audio_server.go go.mod go.sum
 COPY nginx.conf /etc/nginx
 RUN nginx -t
 
-
 # CREATE .vnc DIR
 RUN mkdir -p /home/user/.vnc
+
+# COPY SCRIPT AND CREAT LINK
+COPY entrypoint.sh /src
+COPY audio_server.sh /src/audio_streaming
+RUN ln -s  /src/audio_streaming/audio_server.sh /bin/audio_server
 
 # SET PERMISSION
 RUN chown user:user -R /src && \

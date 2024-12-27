@@ -30,7 +30,7 @@ pulseaudio --start
 vncserver $DISPLAY -depth $VNC_COL_DEPTH -geometry $VNC_RESOLUTION -SecurityTypes VncAuth -localhost no &
 
 # Start audio server
-/src/audio_streaming/audio_server -port $AUDIO_STREAM_PORT & echo $! > /tmp/audio_server.pid
+audio_server start
 
 # Start nginx
 sudo nginx
