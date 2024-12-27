@@ -71,7 +71,7 @@ COPY audio_server.go .
 RUN go mod init audio_server
 RUN go get github.com/gorilla/websocket
 RUN go build -o audio_server audio_server.go
-RUN rm -rf audio_server.go go.mod go.sum
+RUN rm -rf audio_server.go go.mod go.sum /root/go
 
 # NGINX PROXY
 COPY nginx.conf /etc/nginx
