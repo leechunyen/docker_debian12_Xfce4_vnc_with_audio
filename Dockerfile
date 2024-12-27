@@ -33,23 +33,24 @@ RUN apt-get update && \
     fc-cache -fv; \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# ADD GOOGLE CHROME REPOSITORY
-RUN apt-get update -y && apt-get upgrade -y && \
-    curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg && \
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-
-# INSTALL GOOGLE CHROME
-RUN apt-get update -y && \
-    apt-get install -y google-chrome-stable
+# INSTALL FIREFOX
+RUN install -d -m 0755 /etc/apt/keyrings && \
+    curl -fsSL https://packages.mozilla.org/apt/repo-signing-key.gpg | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null && \
+    gpg -n -q --import --import-options import-show /etc/apt/keyrings/packages.mozilla.org.asc | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3") print "\nThe key fingerprint matches ("$0").\n"; else print "\nVerification failed: the fingerprint ("$0") does not match the expected one.\n"}' && \
+    echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null && \
+    echo 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000' | sudo tee /etc/apt/preferences.d/mozilla > /dev/null && \
+    apt-get update && apt-get install firefox
 
 # GET NOVNC
+# noVNC v1.5.0
+# RUN git clone --branch v1.5.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC
 COPY noVNC.zip /opt
 RUN unzip /opt/noVNC.zip -d /opt/ && rm -rf /opt/noVNC.zip /opt/__MACOSX
-# RUN git clone --branch v1.5.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC
+# websockify v0.12.0
 RUN git clone --branch v0.12.0 --single-branch https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify && \
     ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html
 
-# COPY JS LIBRARIES
+# SETUP AUDIO STREAMING LIBRARY FOR noVNC
 COPY jsmpeg.min.js /opt/noVNC
 
 # CREATE USER
@@ -59,7 +60,7 @@ RUN useradd -ms /bin/bash user && \
 
 # GIVE USER PERMISSION TO RUN NGINX WITHOUT PASSWORD
 RUN echo "user ALL=(ALL) NOPASSWD: /usr/sbin/nginx" >> /etc/sudoers
-    
+
 # COPY SCRIPT
 RUN mkdir /src
 COPY entrypoint.sh /src

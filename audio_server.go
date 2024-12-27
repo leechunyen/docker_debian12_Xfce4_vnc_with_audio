@@ -15,14 +15,15 @@ var (
 )
 
 var upgrader = websocket.Upgrader{
-    ReadBufferSize:  1024,
-    WriteBufferSize: 1024,
+    ReadBufferSize:  256,
+    WriteBufferSize: 256,
     CheckOrigin: func(r *http.Request) bool {
         return true // For development, allow all origins. In production, restrict this.
     },
 }
 
 func audioHandler(w http.ResponseWriter, r *http.Request) {
+    // Upgrade HTTP connection to WebSocket
     conn, err := upgrader.Upgrade(w, r, nil)
     if err != nil {
         log.Println("WebSocket upgrade error:", err)
@@ -31,7 +32,17 @@ func audioHandler(w http.ResponseWriter, r *http.Request) {
     defer conn.Close()
 
     // Run FFmpeg to capture audio and encode it in MP2 format
-    cmd := exec.Command("ffmpeg", "-f", "alsa", "-i", "pulse", "-f", "mpegts", "-codec:a", "mp2", "-ar", "44100", "-ac", "2", "-b:a", "128k", "-")
+    cmd := exec.Command(
+		"ffmpeg",
+		"-fflags", "nobuffer",
+		"-flags", "low_delay",
+		"-f", "alsa", "-i", "pulse",
+		"-f", "mpegts",
+		"-codec:a", "mp2",
+		"-ar", "44100",
+		"-ac", "2",
+		"-b:a", "128k", "-",
+	)
     stdout, err := cmd.StdoutPipe()
     if err != nil {
         log.Fatal("Stdout pipe failed:", err)
@@ -42,7 +53,7 @@ func audioHandler(w http.ResponseWriter, r *http.Request) {
     defer cmd.Wait()
 
     // Copy FFmpeg's output directly to WebSocket
-    buffer := make([]byte, 1024)
+    buffer := make([]byte, 256)
     for {
         n, err := stdout.Read(buffer)
         if err != nil {
@@ -56,6 +67,9 @@ func audioHandler(w http.ResponseWriter, r *http.Request) {
             return
         }
     }
+
+    // Prevent handler from exiting immediately
+	select {}
 }
 
 func main() {
