@@ -9,9 +9,6 @@ USER_HOME="/home/user"
 rm /tmp/.X1-lock 2> /dev/null &
 touch "${USER_HOME}/.Xauthority"
 
-# Create .vnc directory
-mkdir -p ~/.vnc
-
 # Set VNC password
 if [ ! -s ~/.vnc/passwd ]; then
   echo "$VNC_PASSWORD" | vncpasswd -f > ~/.vnc/passwd
@@ -32,8 +29,8 @@ pulseaudio --start
 # Start VNC server
 vncserver $DISPLAY -depth $VNC_COL_DEPTH -geometry $VNC_RESOLUTION -SecurityTypes VncAuth -localhost no &
 
-# Start Go audio server
-/src/audio_streaming/audio_server -port $AUDIO_STREAM_PORT &
+# Start audio server
+/src/audio_streaming/audio_server -port $AUDIO_STREAM_PORT & echo $! > /tmp/audio_server.pid
 
 # Start nginx
 sudo nginx

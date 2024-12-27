@@ -64,7 +64,6 @@ RUN echo "user ALL=(ALL) NOPASSWD: /usr/sbin/nginx" >> /etc/sudoers
 # COPY SCRIPT
 RUN mkdir /src
 COPY entrypoint.sh /src
-RUN chmod +x /src/entrypoint.sh
 
 # COMPILE audio_server
 RUN mkdir /src/audio_streaming
@@ -79,7 +78,14 @@ RUN rm -rf audio_server.go go.mod go.sum
 COPY nginx.conf /etc/nginx
 RUN nginx -t
 
-RUN chown user:user -R /src && chmod +x -R /src
+
+# CREATE .vnc DIR
+RUN mkdir -p /home/user/.vnc
+
+# SET PERMISSION
+RUN chown user:user -R /src && \
+    chmod +x -R /src && \
+    chown user:user -R /home/user/.vnc
 
 # SET DEFAULT USER
 USER user
