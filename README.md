@@ -46,6 +46,7 @@ Here's how to set it up and use it:
 **Troubleshooting**
   - Port Conflicts: If you encounter port issues, ensure no other services are using the ports you've chosen.
   - VNC Connection Issues: Check your VNC password and try restarting the container if connectivity persists.
+  - Audio Latency: If you encounter audio delay, you can restart the audio server by running `audio_server restart` in the terminal.
   
 ## License
   This project is licensed under the MIT License, see the [LICENSE](LICENSE) file for details.
