@@ -2,7 +2,6 @@ FROM debian:12
 
 # ENVIRONMENT VARIABLES
 ENV DISPLAY=:1 \
-    USER_PASSWORD='password' \
     VNC_PASSWORD='password' \
     WEB_PORT=80 \
     VNC_PORT=5901 \
@@ -56,7 +55,7 @@ COPY jsmpeg.min.js /opt/noVNC
 # CREATE USER
 RUN useradd -ms /bin/bash user && \
     usermod -aG sudo user && \
-    echo "user:$USER_PASSWORD" | chpasswd
+    echo "user:user-pass-123" | chpasswd
 
 # GIVE USER PERMISSION TO RUN NGINX WITHOUT PASSWORD
 RUN echo "user ALL=(ALL) NOPASSWD: /usr/sbin/nginx" >> /etc/sudoers
