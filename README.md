@@ -53,6 +53,4 @@ Here's how to set it up and use it:
 
 ## Supporting me
   [Donate Link](https://gogetfunding.com/open-source-project-and-library/)\
-  THANK for your support
-
-
+  Thank you for your support!
