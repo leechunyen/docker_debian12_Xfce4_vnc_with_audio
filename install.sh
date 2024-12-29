@@ -34,7 +34,7 @@ get_container_name() {
         read -p "Enter a container name (default: $IMAGE_NAME): " container_name
         CONTAINER_NAME=${container_name:-$IMAGE_NAME}
         if ! check_container_name "$CONTAINER_NAME"; then
-            echo "container name $CONTAINER_NAME already exist please use a different name."
+            echo "Container name $CONTAINER_NAME already exists. Please use a different name."
         else
             break
         fi
@@ -57,18 +57,7 @@ get_vnc_password() {
 
 # Function to get user input for ports with availability check
 get_ports() {
-    while true; do
-        read -p "Enter VNC port (default: 5901): " vnc_port
-        VNC_PORT=${vnc_port:-5901}
-        if ! [[ "$VNC_PORT" =~ ^[0-9]{1,5}$ ]] || ! [ "$VNC_PORT" -ge 1 ] || ! [ "$VNC_PORT" -le 65535 ]; then
-            echo "Invalid port number."
-        elif ! check_port $VNC_PORT; then
-            echo "Port $VNC_PORT is already in use. Please choose a different port for VNC."
-        else
-            break
-        fi
-    done
-
+    # noVNC
     while true; do
         read -p "Enter noVNC port (default: 8080): " novnc_port
         NO_VNC_PORT=${novnc_port:-8080}
@@ -78,6 +67,25 @@ get_ports() {
             echo "Port $NO_VNC_PORT is already in use. Please choose a different port for noVNC."
         else
             break
+        fi
+    done
+
+    # VNC
+    while true; do
+        read -p "Do you want to open a port for VNC? (y/n) [default: n]: " open_vnc
+        if [[ "$open_vnc" != [Yy]* ]]; then
+            VNC_PORT=0  # Setting to 0 means we won't expose this port
+            break
+        else
+            read -p "Enter VNC port (default: 5901): " vnc_port
+            VNC_PORT=${vnc_port:-5901}
+            if ! [[ "$VNC_PORT" =~ ^[0-9]{1,5}$ ]] || ! [ "$VNC_PORT" -ge 1 ] || ! [ "$VNC_PORT" -le 65535 ]; then
+                echo "Invalid port number."
+            elif ! check_port $VNC_PORT; then
+                echo "Port $VNC_PORT is already in use. Please choose a different port for VNC."
+            else
+                break
+            fi
         fi
     done
 }
@@ -137,11 +145,16 @@ if [ "$AUTO_START" = "yes" ]; then
     AUTO_START_FLAG="--restart=always"
 fi
 
+VNC_PORT_MAP=""
+if [ "$VNC_PORT" -ne 0 ]; then
+    VNC_PORT_MAP="-p $VNC_PORT:5901"
+fi
+
 if ! docker run -d \
     $AUTO_START_FLAG \
     --name $CONTAINER_NAME \
     -p $NO_VNC_PORT:80 \
-    -p $VNC_PORT:5901 \
+    $VNC_PORT_MAP \
     -e VNC_PASSWORD="$VNC_PASSWORD" \
     $IMAGE_NAME; then
     echo "Failed to run the Docker container."
@@ -151,7 +164,9 @@ fi
 # Output instructions
 echo "VNC server is running:"
 echo " - Access via noVNC: http://$HOST_IP:$NO_VNC_PORT/vnc.html"
-echo " - Access via VNC client: connect to $HOST_IP on port $VNC_PORT"
+if [ "$VNC_PORT" -ne 0 ]; then
+    echo " - Access via VNC client: connect to $HOST_IP on port $VNC_PORT"
+fi
 echo "VNC password: $VNC_PASSWORD"
-echo "Auto-start on reboot: $AUTO_START"
+echo "Auto start on reboot: $AUTO_START"
 echo "Default user password: user-pass-123 (change it using 'passwd' in the terminal)"
