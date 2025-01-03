@@ -13,7 +13,11 @@ ENV DISPLAY=:1 \
     TERM=xterm \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
-    LANGUAGE=en_US:en
+    LANGUAGE=en_US:en \
+    IBUS_ENABLE_SYNC_MODE=1 \
+    GTK_IM_MODULE=ibus \
+    QT_IM_MODULE=ibus \
+    XMODIFIERS=@im=ibus
 
 # INSTALL DEPENDENCIES
 RUN apt-get update && \
@@ -88,6 +92,10 @@ RUN ln -s  /src/audio_streaming/audio_server.sh /bin/audio_server
 RUN chown user:user -R /src && \
     chmod +x -R /src && \
     chown user:user -R /home/user/.vnc
+
+# INSTALL AND START IBUS WHEN LOGIN
+RUN apt -y install ibus ibus-pinyin
+RUN echo "ibus-daemon -d -x" >> /home/user/.profile
 
 # SET DEFAULT USER
 USER user
