@@ -10,8 +10,8 @@ Here's how to set it up and use it:
 
 **Clone the repository and run**
    ```sh
-   git clone https://github.com/leechunyen/docker_debian12_-Xfce4_vnc_with_audio.git
-   cd docker_debian12_-Xfce4_vnc_with_audio
+   git clone https://github.com/leechunyen/docker_debian12_Xfce4_vnc_with_audio.git
+   cd docker_debian12_Xfce4_vnc_with_audio
    chmod +x install.sh
    ./install.sh
    ```
